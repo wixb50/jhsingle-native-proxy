@@ -1,11 +1,25 @@
 import os
+import ssl
 import json
 from datetime import datetime
 
 from tornado.ioloop import PeriodicCallback
 from tornado import httpclient
 
-from jupyterhub.utils import make_ssl_context, exponential_backoff, isoformat
+from jupyterhub.utils import exponential_backoff, isoformat
+
+
+def make_ssl_context(keyfile, certfile, cafile=None, verify=True, check_hostname=True):
+    """Setup context for starting an https server or making requests over ssl."""
+    if not keyfile or not certfile:
+        return None
+    purpose = ssl.Purpose.SERVER_AUTH if verify else ssl.Purpose.CLIENT_AUTH
+    ssl_context = ssl.create_default_context(purpose, cafile=cafile)
+    ssl_context.load_default_certs()
+    ssl_context.load_cert_chain(certfile, keyfile)
+    ssl_context.check_hostname = check_hostname
+    return ssl_context
+
 
 def configure_http_client():
     keyfile = os.environ.get('JUPYTERHUB_SSL_KEYFILE', '')
