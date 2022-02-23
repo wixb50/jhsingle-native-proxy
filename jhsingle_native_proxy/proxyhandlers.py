@@ -7,7 +7,7 @@ from simpervisor import SupervisedProcess
 from datetime import datetime
 from asyncio import Lock, ensure_future
 from .util import url_path_join
-from .websocket import WebSocketHandlerMixin, pingable_ws_connect
+from .websocket import WebSocketHandlerMixin, pingable_ws_connect, maybe_future
 from tornado.log import app_log, gen_log
 from jupyterhub.services.auth import HubOAuthenticated
 from urllib.parse import urlunparse, urlparse, quote
@@ -427,7 +427,7 @@ class ProxyHandler(HubOAuthenticated, WebSocketHandlerMixin):
         # Now establish websocket between client and ourself - BACK TO ORIGINAL CODE NOW
         self.ws_connection = self.get_websocket_protocol()
         if self.ws_connection:
-            await self.ws_connection.accept_connection(self)
+            await maybe_future(self.ws_connection.accept_connection() if hasattr(self.ws_connection, 'handler') else self.ws_connection.accept_connection(self))
         else:
             self.set_status(426, "Upgrade Required")
             self.set_header("Sec-WebSocket-Version", "7, 8, 13")
@@ -840,7 +840,7 @@ class SuperviseAndProxyHandler(LocalProxyHandler):
 
     async def proxy(self, port, path):
         if self.authtype == 'oauth':
-            return await self.oauth_proxy(port, path)
+            return await maybe_future(self.oauth_proxy(port, path))
         else:
             return await self.core_proxy(port, path)
 

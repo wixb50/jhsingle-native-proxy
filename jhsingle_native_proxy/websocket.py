@@ -38,13 +38,15 @@ class PingableWSClientConnection(websocket.WebSocketClientConnection):
             self._on_get_headers_callback = kwargs['on_get_headers_callback']
             del(kwargs['on_get_headers_callback'])
         super().__init__(**kwargs)
+        if self.max_message_size is None:
+            self.max_message_size = 10 * 1024 * 1024
 
     def on_ping(self, data):
         if self._on_ping_callback:
             self._on_ping_callback(data)
 
     async def headers_received(self, *args, **kwargs):
-        await super().headers_received(*args, **kwargs)
+        await maybe_future(super().headers_received(*args, **kwargs))
         if self._on_get_headers_callback and hasattr(self, 'headers'):
             self._on_get_headers_callback(self.headers)
 
