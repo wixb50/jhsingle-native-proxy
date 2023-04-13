@@ -38,7 +38,7 @@ class PingableWSClientConnection(websocket.WebSocketClientConnection):
             self._on_get_headers_callback = kwargs['on_get_headers_callback']
             del(kwargs['on_get_headers_callback'])
         super().__init__(**kwargs)
-        if self.max_message_size is None:
+        if hasattr(self, 'max_message_size'):
             self.max_message_size = 10 * 1024 * 1024
 
     def on_ping(self, data):

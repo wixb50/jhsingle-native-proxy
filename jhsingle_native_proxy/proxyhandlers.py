@@ -427,7 +427,7 @@ class ProxyHandler(HubOAuthenticated, WebSocketHandlerMixin):
         # Now establish websocket between client and ourself - BACK TO ORIGINAL CODE NOW
         self.ws_connection = self.get_websocket_protocol()
         if self.ws_connection:
-            await maybe_future(self.ws_connection.accept_connection() if hasattr(self.ws_connection, 'handler') else self.ws_connection.accept_connection(self))
+            await maybe_future(self.ws_connection.accept_connection() if hasattr(self.ws_connection, 'request') else self.ws_connection.accept_connection(self))
         else:
             self.set_status(426, "Upgrade Required")
             self.set_header("Sec-WebSocket-Version", "7, 8, 13")
