@@ -157,7 +157,7 @@ def get_port_from_env():
 @click.option('--last-activity-interval', default=300, type=click.INT, help='frequency to notify hub that dashboard is still running in seconds (default 300), 0 for never')
 @click.option('--force-alive/--no-force-alive', default=True, help='Always report that there has been activity (force keep alive) - only happens if last-activity-interval > 0')
 @click.option('--ready-check-path', default='/', help='URL path to poll for readiness (default /)')
-@click.option('--ready-timeout', default=10, help='Timeout for readiness request in seconds (default 60)')
+@click.option('--ready-timeout', default=60, help='Timeout for readiness request in seconds (default 60)')
 @click.option('--repo', default='', help="Git repo to pull before running webapp subprocess")
 @click.option('--repobranch', default='master', help="Branch to checkout (if --repo provided)")
 @click.option('--repofolder', default='.', help="Relative folder to hold git repo contents (if --repo provided)")

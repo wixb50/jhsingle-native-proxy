@@ -25,6 +25,7 @@ def configure_http_client():
     keyfile = os.environ.get('JUPYTERHUB_SSL_KEYFILE', '')
     certfile = os.environ.get('JUPYTERHUB_SSL_CERTFILE', '')
     client_ca = os.environ.get('JUPYTERHUB_SSL_CLIENT_CA', '')
+    httpclient.AsyncHTTPClient.configure(None, max_body_size=80*1024**3)
 
     if keyfile == '' and certfile == '' and client_ca == '':
         return

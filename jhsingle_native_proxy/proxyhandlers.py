@@ -654,7 +654,7 @@ class SuperviseAndProxyHandler(LocalProxyHandler):
         self.origin_host = None
 
         self.ready_check_path = '/'
-        self.ready_timeout = 10
+        self.ready_timeout = 60
 
         super().__init__(*args, **kwargs)
 
@@ -749,7 +749,8 @@ class SuperviseAndProxyHandler(LocalProxyHandler):
                         self.stderr_str = None
                         self.stdout_str = None
 
-                        stderr, stdout = await proc.proc.communicate()
+                        sub_proc = getattr(proc.proc, '_proc', proc.proc)
+                        stderr, stdout = await sub_proc.communicate()
 
                         if stderr:
                             self.stderr_str = str(stderr.decode("utf-8"))
@@ -768,9 +769,10 @@ class SuperviseAndProxyHandler(LocalProxyHandler):
                         # Make sure we empty the buffers periodically
 
                         async def pipe_output(proc, pipename, log):
+                            sub_proc = getattr(proc.proc, '_proc', proc.proc)
                             while True:
-                                if proc.proc:
-                                    stream = getattr(proc.proc, pipename, None)
+                                if sub_proc:
+                                    stream = getattr(sub_proc, pipename, None)
                                     if stream:
                                         try:
                                             line = await stream.readline()
